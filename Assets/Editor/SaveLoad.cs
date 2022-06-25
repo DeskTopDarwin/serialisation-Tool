@@ -48,7 +48,7 @@ public class SaveLoad : EditorWindow
         foreach (var shape in shapes)
         {
             Shape toJson = new Shape();
-            //toJson.primitiveType = shape.GetComponent<MeshFilter>().mesh;
+            toJson.primitiveType = shape.name;
             toJson.position = shape.position;
             toJson.rotation = shape.rotation;
             toJson.color = shape.GetComponent<MeshRenderer>().material.color;
@@ -75,14 +75,34 @@ public class SaveLoad : EditorWindow
         }
         temp.Clear();
 
+        //create from save file
         foreach (var item in listOfItems.shapes)
         {
-            //GameObject shape = GameObject.CreatePrimitive(primitiveType);
-            //shape
+            PrimitiveType primitive;
+
+            switch (item.primitiveType)
+            {
+                case "Cube":
+                    primitive = PrimitiveType.Cube;
+                    break;
+                case "Cylinder":
+                    primitive = PrimitiveType.Cylinder;
+                    break;
+                case "Shere":
+                    primitive= PrimitiveType.Sphere;
+                    break;
+                default:
+                    primitive = PrimitiveType.Cube;
+                    break;
+            }
+
+            GameObject shape = GameObject.CreatePrimitive(primitive);
+            shape.name = item.primitiveType;
+            shape.transform.position = item.position;
+            shape.transform.rotation = item.rotation;
+            shape.GetComponent<MeshRenderer>().material.color = item.color;
+            shape.AddComponent<Rigidbody>();
         }
-
-        
-
     }
 
     private void CreateShapes()
@@ -125,17 +145,17 @@ public class SaveLoad : EditorWindow
         }
 
         GameObject shape = GameObject.CreatePrimitive(primitiveType);
-        shape.GetComponent<MeshRenderer>().material.color = new Color32((byte)Random.Range(0,255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
-        shape.AddComponent<Rigidbody>();
         shape.name = shapeName;
         shape.transform.position = new Vector3(Random.Range(-spawnRange2D, spawnRange2D), Random.Range(1, spawnRange3D), Random.Range(-spawnRange2D, spawnRange2D));
+        shape.GetComponent<MeshRenderer>().material.color = new Color32((byte)Random.Range(0,255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255);
+        shape.AddComponent<Rigidbody>();
 
     }
     
     [System.Serializable]
     public class Shape
     {
-        public PrimitiveType primitiveType;
+        public string primitiveType;
         public Vector3 position;
         public Quaternion rotation;
         public Color32 color;
